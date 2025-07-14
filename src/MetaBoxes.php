@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Bojaghi\MetaBoxes;
 
-use Bojaghi\Contract\Container;
 use Bojaghi\Contract\Module;
 use Bojaghi\Helper\Helper;
 
@@ -18,8 +17,6 @@ class MetaBoxes implements Module
     const CONTEXT_NORMAL   = 'normal';
     const CONTEXT_SIDE     = 'side';
 
-    private ?Container $continy = null;
-
     /** @var array<string, string|array|callable> */
     private array $realCallbacks = [];
 
@@ -30,26 +27,10 @@ class MetaBoxes implements Module
     {
         $args = wp_parse_args(Helper::loadConfig($args), static::getDefaultConfig());
 
-        // Assign continy here.
-        if ($args['continy'] && in_array(Container::class, class_implements($args['continy']))) {
-            $this->continy = $args['continy'];
-        }
-
         // Add meta boxes
         if (!empty($args['add'])) {
             foreach ((array)$args['add'] as $item) {
-                $item = wp_parse_args(
-                    $item,
-                    [
-                        'id'            => '',                       // Required
-                        'title'         => '',                       // Required
-                        'callback'      => '',                       // Required
-                        'screen'        => null,                     // Optional
-                        'context'       => static::CONTEXT_ADVANCED, // Optional
-                        'priority'      => static::PRIORITY_DEFAULT, // Optional
-                        'callback_args' => null,                     // Optional
-                    ],
-                );
+                $item = wp_parse_args($item, static::getDefaultAddConfig());
 
                 if ($item['id'] && $item['screen'] && $item['callback']) {
                     // Assign real callbacks here
@@ -71,14 +52,7 @@ class MetaBoxes implements Module
         // Remove meta boxes
         if (!empty($args['remove'])) {
             foreach ((array)$args['remove'] as $item) {
-                $item = wp_parse_args(
-                    $item,
-                    [
-                        'id'      => '',       // Required
-                        'screen'  => null,     // Required
-                        'context' => 'normal', // Required
-                    ],
-                );
+                $item = wp_parse_args($item, static::getDefaultRemoveConfig());
 
                 if ($item['id'] && $item['screen'] && $item['context']) {
                     remove_meta_box(
@@ -94,9 +68,30 @@ class MetaBoxes implements Module
     public static function getDefaultConfig(): array
     {
         return [
-            'add'      => [],
-            'remove'   => [],
-            'continy'  => null,
+            'add'    => [],
+            'remove' => [],
+        ];
+    }
+
+    public static function getDefaultAddConfig(): array
+    {
+        return [
+            'id'            => '',                       // Required
+            'title'         => '',                       // Required
+            'callback'      => '',                       // Required
+            'screen'        => null,                     // Optional
+            'context'       => static::CONTEXT_ADVANCED, // Optional
+            'priority'      => static::PRIORITY_DEFAULT, // Optional
+            'callback_args' => null,                     // Optional
+        ];
+    }
+
+    public static function getDefaultRemoveConfig(): array
+    {
+        return [
+            'id'      => '',       // Required
+            'screen'  => null,     // Required
+            'context' => 'normal', // Required
         ];
     }
 
@@ -107,10 +102,6 @@ class MetaBoxes implements Module
         }
 
         $callback = $this->realCallbacks[$setup['id']];
-
-        if ($this->continy) {
-            $callback = $this->continy->parseCallback($callback);
-        }
 
         if ($callback) {
             call_user_func_array($callback, [$object, $setup]);

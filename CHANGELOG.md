@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.0.2
+
+2025-07-15
+
+- `Continy::parseCallback` 의존성 제거
+
 ## 1.0.1
 
 2025-07-14

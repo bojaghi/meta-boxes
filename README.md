@@ -37,8 +37,6 @@ add_action( 'do_meta_boxes', function () { new MetaBoxes(/* ... */ ); }, 50 );
 [
     'add'      => [ /* 추가할 메타 박스 */ ],
     'remove'   => [ /* 제거할 메타 박스 */ ],
-    'continy'  => null, // 또는 Continy 객체
-    'priority' => 10,   // 'do_meta_boxes' 액션 콜백의 우선순위값. 기본 10.
 ]
 ```
 
