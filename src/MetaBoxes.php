@@ -24,27 +24,16 @@ class MetaBoxes implements Module
     private array $realCallbacks = [];
 
     /**
-     * @param array $args Setup array
+     * @param array|string $args Setup array
      */
-    public function __construct(private array $args = [])
+    public function __construct(array|string $args = [])
     {
-        if ($this->args && !did_action('do_meta_boxes') && !has_action('do_meta_boxes', [$this, 'callback'])) {
-            $priority = (int)($args['priority'] ?? '10');
-            add_action('do_meta_boxes', [$this, 'callback'], $priority);
-        }
-    }
-
-    public function callback(): void
-    {
-        $args = wp_parse_args(Helper::loadConfig($this->args), static::getDefaultConfig());
+        $args = wp_parse_args(Helper::loadConfig($args), static::getDefaultConfig());
 
         // Assign continy here.
         if ($args['continy'] && in_array(Container::class, class_implements($args['continy']))) {
             $this->continy = $args['continy'];
         }
-
-        // Purge initial value.
-        $this->args = [];
 
         // Add meta boxes
         if (!empty($args['add'])) {
@@ -108,7 +97,6 @@ class MetaBoxes implements Module
             'add'      => [],
             'remove'   => [],
             'continy'  => null,
-            'priority' => 10,
         ];
     }
 

@@ -22,7 +22,12 @@ new MetaBoxes([ /* ... setup ... */]);
 new MetaBoxes('/path/to/setup/file');
 ```
 
-MetaBoxes 클래스를 인스턴스화 하면 알아서 'do_meta_boxes' 훅의 콜백을 추가합니다.
+MetaBoxes 클래스는 'do_meta_boxes' 액션의 콜백에서 생성하세요. 즉 아래와 비슷한 흐름으로 코드가 작성되어야 합니다.
+
+```php
+
+add_action( 'do_meta_boxes', function () { new MetaBoxes(/* ... */ ); }, 50 );
+```
 
 ## 설정
 

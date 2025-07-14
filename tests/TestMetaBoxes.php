@@ -9,7 +9,7 @@ class TestMetaBoxes extends WP_UnitTestCase
 {
     public function test_meta_boxes(): void
     {
-        global $current_screen, $wp_meta_boxes;
+        global $wp_meta_boxes;
 
         set_current_screen('test');
         $screen = get_current_screen();
@@ -39,9 +39,6 @@ class TestMetaBoxes extends WP_UnitTestCase
             ],
         );
 
-        // Test callback
-        $boxes->callback();
-
         // Check if two meta boxes are properly registered.
         $this->assertNotEmpty($wp_meta_boxes['test'][MetaBoxes::CONTEXT_NORMAL][MetaBoxes::PRIORITY_DEFAULT]);
 
@@ -57,7 +54,7 @@ class TestMetaBoxes extends WP_UnitTestCase
         // Check if the function is invoked
         $this->assertTrue($invoked);
 
-        (new MetaBoxes(
+        new MetaBoxes(
             [
                 'remove' => [
                     [
@@ -67,7 +64,7 @@ class TestMetaBoxes extends WP_UnitTestCase
                     ],
                 ],
             ],
-        ))->callback();
+        );
 
         // Check if test-metabox-2 is unregistered.
         $removeBoxes = $wp_meta_boxes['test'][MetaBoxes::CONTEXT_NORMAL][MetaBoxes::PRIORITY_DEFAULT];
